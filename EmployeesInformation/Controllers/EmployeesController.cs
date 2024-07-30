@@ -8,29 +8,29 @@ namespace EmployeesInformation.Controllers
     [ApiController]
     public class EmployeesController : ControllerBase
     {
-        private readonly EmployeeDataStore _employeedataStore;
+        private readonly EmployeeDataStore _employeeDataStore;
 
-        public EmployeesController()
+        public EmployeesController(EmployeeDataStore employeeDataStore)
         {
-            _employeedataStore = new EmployeeDataStore();
+            _employeeDataStore = employeeDataStore;
         }
 
         [HttpGet] // GET: api/employees
-        public JsonResult GetEmployees()
+        public async Task<JsonResult> GetEmployees()
         {
-            var employees = _employeedataStore.Employees;
+            var employees = await _employeeDataStore.GetEmployeesAsync();
             return new JsonResult(employees);
         }
 
-        [HttpGet("{id}")]
-        public JsonResult GetEmployee(int id)
+        [HttpGet("{id}")] // GET: api/employees/{id}
+        public async Task<JsonResult> GetEmployee(int id)
         {
-            var employees = _employeedataStore.Employees.FirstOrDefault(e => e.Id == id);
-            if (employees == null)
+            var employee = await _employeeDataStore.GetEmployeeByIdAsync(id);
+            if (employee == null)
             {
-                return new JsonResult(new { message = "employee not found" }) { StatusCode = 404 };
+                return new JsonResult(new { message = "Employee not found" }) { StatusCode = 404 };
             }
-            return new JsonResult(employees);
+            return new JsonResult(employee);
         }
     }
 }
